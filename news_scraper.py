@@ -20,7 +20,7 @@ def addItemInDb(headline,content,link,category):
     conn.commit()
     conn.close()
 
-
+#Scraper for Money Control
 def scrapeNews(pageNumber):
     url=f'https://www.moneycontrol.com/news/tags/corporate-action.html/page-{pageNumber}/'
     ist_of_li=[]
