@@ -1,5 +1,6 @@
 import sqlite3
 import requests,bs4
+import csv
 
 
 #Initializing the database
@@ -32,6 +33,18 @@ def scrapeNews(pageNumber):
     for li in list_of_li:
         addItemInDb(li.find_all('h2')[0].text,li.find_all('p')[0].text,li.find_all('a')[0]['href'],'None')
     print(f'Done acraping and storing page{pageNumber}')
+
+#Creating CSV from the database
+def writeDataInCsv():
+    with open('news.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Category","News"])
+        conn=sqlite3.connect('news.db')
+        c=conn.cursor()
+        readData='SELECT * FROM news'
+        c.execute(readData)
+        for row in c:
+            writer.writerow([row[3],row[1]])
     
 
 if __name__ == "__main__":
@@ -39,4 +52,3 @@ if __name__ == "__main__":
     for i in range(1,6):
         scrapeNews(i)
     print('DONE')
-
