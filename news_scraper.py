@@ -31,7 +31,20 @@ def scrapeNews(pageNumber):
     page=soup.find('ul',{'id':'cagetory'})
     list_of_li=page.find_all('li',{'class':'clearfix'})
     for li in list_of_li:
-        addItemInDb(li.find_all('h2')[0].text,li.find_all('p')[0].text,li.find_all('a')[0]['href'],'None')
+        addItemInDb(li.find_all('h2')[0].text,li.find_all('p')[0].text,li.find_all('a')[0]['href'],'ca')
+    print(f'Done acraping and storing page{pageNumber}')
+
+#Scraper for non ca
+def scrapeNonCa(pageNumber):
+    url=f'https://www.moneycontrol.com/news/business/page-{pageNumber}/'
+    ist_of_li=[]
+    res=requests.get(url)
+    res.raise_for_status()
+    soup = bs4.BeautifulSoup(res.text,features='lxml')
+    page=soup.find('ul',{'id':'cagetory'})
+    list_of_li=page.find_all('li',{'class':'clearfix'})
+    for li in list_of_li:
+        addItemInDb(li.find_all('h2')[0].text,li.find_all('p')[0].text,li.find_all('a')[0]['href'],'notca')
     print(f'Done acraping and storing page{pageNumber}')
 
 #Creating CSV from the database
@@ -49,6 +62,7 @@ def writeDataInCsv():
 
 if __name__ == "__main__":
     initializeDb()
-    for i in range(1,6):
-        scrapeNews(i)
+    for i in range(1,3):
+        scrapeNonCa(i)
     print('DONE')
+    # writeDataInCsv()
