@@ -60,8 +60,3 @@ class ScrapeIndiaToday:
             )
         conn.commit()
         conn.close()
-
-
-sc = ScrapeIndiaToday()
-sc.get_india_today()
-sc.dump_in_db()
