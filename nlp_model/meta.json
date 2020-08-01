@@ -476,7 +476,7 @@
     "width":0,
     "vectors":0,
     "keys":0,
-    "name":"spacy_pretrained_vectors"
+    "name":null
   },
   "factories":{
     "tagger":"tagger",

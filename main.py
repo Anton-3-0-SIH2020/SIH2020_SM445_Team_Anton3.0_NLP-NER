@@ -4,9 +4,23 @@ import csv
 import spacy
 import pickle
 import en_core_web_sm
+import pandas as pd
+import nltk
+import string
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
 
-
-
+#Pre-processing the text
+def text_process(text):
+    #Remove the punctuation
+    #Remove the stopwords
+    #Return list of clean text
+    text=''.join([char for char in text if char not in string.punctuation])
+    return [word for word in text.split() if word.lower() not in stopwords.words('english')]
 
 # Initializing the database
 def initializeDb():
@@ -53,8 +67,8 @@ def getCaType(news):
     doc = nlp(news)
     for ent in doc.ents:
         print('CA Type: '+ent.text)
-        print('----CA----')
-        print()
+    print('----CA----')
+    print()
 
 #Getting the general details like the orgainsation and date etc
 def getGeneralDetails(news):
@@ -78,6 +92,16 @@ def getGeneralDetails(news):
     print('Ex-Date: '+ex_date)
     print('Record-Date: '+record_date)
 
+#Categorise the news based on
+def newsCategoriser(news):
+    filename = 'nlp_model_categorizer'
+    infile = open(filename,'rb')
+    pipeline = pickle.load(infile)
+    infile.close()
+    predictions = pipeline.predict(pd.Series(news))
+    return predictions[0]
+
+
 if __name__=="__main__":
     # initializeDb()
     # moneyControlScraper=Money_Control_Scraper.MoneyControlScraper()
@@ -85,6 +109,12 @@ if __name__=="__main__":
     # writeDataInCsv()
     # createDbOfCaForNer()
 
-    news='Va Tech Wabag is quoting ex-split today. The company approved a proposal to sub-divide each ordinary equity share of face value of Rs 5/- each into face value of Rs 2 each fully paid up on May 26, 2011. The record date has been fixed at August 17.'
-    getGeneralDetails(news)
-    getCaType(news)
+    news='Shareholders of Torrent Power will consider a proposal for a dividend of Rs 2.20 per share for 2016-17 at its annual general meeting on August 1'
+    category=newsCategoriser(news)
+
+    if category=='ca':
+        getGeneralDetails(news)
+        getCaType(news)
+
+    else:
+        print('----NOT CA----')
