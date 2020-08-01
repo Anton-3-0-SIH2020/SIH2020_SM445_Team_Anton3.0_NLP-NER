@@ -1,9 +1,8 @@
-from NewsScraper import Money_Control_Scraper
 import sqlite3
 import csv
 import spacy
 import pickle
-import en_core_web_sm
+import en_core_web_md
 import pandas as pd
 import nltk
 import string
@@ -13,8 +12,9 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
+from Prediction_Pipeline import prediction_pipeline
 
-#Pre-processing the text
+#Function to clean the text and pre processing it
 def text_process(text):
     #Remove the punctuation
     #Remove the stopwords
@@ -61,60 +61,46 @@ def createDbOfCaForNer():
     conn.commit()
     conn.close()
 
-#Getting the type of Ca
-def getCaType(news):
-    nlp=spacy.load('nlp_model')
-    doc = nlp(news)
-    for ent in doc.ents:
-        print('CA Type: '+ent.text)
-    print('----CA----')
-    print()
 
-#Getting the general details like the orgainsation and date etc
-def getGeneralDetails(news):
-    org=''
-    ex_date=''
-    record_date=''
+#Read all the news from db
+def addCaPredictedDataToDb():
+    conn=sqlite3.connect('news.db')
+    c=conn.cursor()
+    read_data='SELECT * FROM news'
+    c.execute(read_data)
 
-    nlp = spacy.load('en_core_web_sm')
-    doc = nlp(news)
-    for ent in doc.ents:
-        if(ent.label_=='ORG' and org==''):
-            org=ent.text
-        elif(ent.label_=='DATE' and record_date==''):
-            record_date=ent.text
-        elif(ent.label_=='DATE' and ex_date==''):
-            ex_date=ent.text
-    
-    print()
-    print('----CA----')
-    print('Organisation: '+org)
-    print('Ex-Date: '+ex_date)
-    print('Record-Date: '+record_date)
+    conn2=sqlite3.connect('corporate_action.db')
+    c1=conn2.cursor()
 
-#Categorise the news based on
-def newsCategoriser(news):
-    filename = 'nlp_model_categorizer'
-    infile = open(filename,'rb')
-    pipeline = pickle.load(infile)
-    infile.close()
-    predictions = pipeline.predict(pd.Series(news))
-    return predictions[0]
+    add_item_to_table='INSERT INTO predicted_ca VALUES(?,?,?,?)'
 
+    for row in c:
+        news=row[1]
+        print(news)
+        pipeline=prediction_pipeline.PredictionPipeline()
+        detailList=pipeline.pipeline(news)
+        detailList.append(news)
+        if(len(detailList)>1):
+            if(detailList[0]!=''):
+                c1.execute(add_item_to_table,(detailList[0],detailList[1],detailList[2],news))
+                conn2.commit()
+    conn.close()
+    conn2.close()
+
+#Create DB for predicted ca
+def createPredictedCaDb():
+    conn = sqlite3.connect('corporate_action.db')
+    c = conn.cursor()
+    create_table = 'CREATE TABLE IF NOT EXISTS predicted_ca (security_name text,purpose text,all_date text,content text)'
+    c.execute(create_table)
+    conn.commit()
+    conn.close()
 
 if __name__=="__main__":
-    # initializeDb()
-    # moneyControlScraper=Money_Control_Scraper.MoneyControlScraper()
-    # moneyControlScraper.scrapeNews()
-    # writeDataInCsv()
-    # createDbOfCaForNer()
+    news='Honeywell had announced a sub - division of its existing equity shares from Rs 10 each on October 12'
+    pipeline=prediction_pipeline.PredictionPipeline()
+    output=pipeline.pipeline(news)
+    output.append(news)
+    print(output)
 
-    news='Shareholders of Torrent Power will consider a proposal for a dividend of Rs 2.20 per share for 2016-17 at its annual general meeting on August 1'
-    category=newsCategoriser(news)
-
-    if category=='ca':
-        getGeneralDetails(news)
-        getCaType(news)
-
-    else:
-        print('----NOT CA----')
+    # addCaPredictedDataToDb()
