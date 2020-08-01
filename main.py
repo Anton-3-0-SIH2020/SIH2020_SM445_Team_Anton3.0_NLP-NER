@@ -1,6 +1,10 @@
 from NewsScraper import Money_Control_Scraper
 import sqlite3
 import csv
+import spacy
+import pickle
+import en_core_web_sm
+
 
 
 
@@ -25,6 +29,7 @@ def writeDataInCsv():
         for row in c:
             writer.writerow([row[3], row[1]])
 
+#Creating DB for new from the news table with only ca related news
 def createDbOfCaForNer():
     conn=sqlite3.connect('news.db')
     c=conn.cursor()
@@ -42,10 +47,44 @@ def createDbOfCaForNer():
     conn.commit()
     conn.close()
 
+#Getting the type of Ca
+def getCaType(news):
+    nlp=spacy.load('nlp_model')
+    doc = nlp(news)
+    for ent in doc.ents:
+        print('CA Type: '+ent.text)
+        print('----CA----')
+        print()
+
+#Getting the general details like the orgainsation and date etc
+def getGeneralDetails(news):
+    org=''
+    ex_date=''
+    record_date=''
+
+    nlp = spacy.load('en_core_web_sm')
+    doc = nlp(news)
+    for ent in doc.ents:
+        if(ent.label_=='ORG' and org==''):
+            org=ent.text
+        elif(ent.label_=='DATE' and record_date==''):
+            record_date=ent.text
+        elif(ent.label_=='DATE' and ex_date==''):
+            ex_date=ent.text
+    
+    print()
+    print('----CA----')
+    print('Organisation: '+org)
+    print('Ex-Date: '+ex_date)
+    print('Record-Date: '+record_date)
+
 if __name__=="__main__":
     # initializeDb()
     # moneyControlScraper=Money_Control_Scraper.MoneyControlScraper()
     # moneyControlScraper.scrapeNews()
     # writeDataInCsv()
+    # createDbOfCaForNer()
 
-    createDbOfCaForNer()
+    news='Va Tech Wabag is quoting ex-split today. The company approved a proposal to sub-divide each ordinary equity share of face value of Rs 5/- each into face value of Rs 2 each fully paid up on May 26, 2011. The record date has been fixed at August 17.'
+    getGeneralDetails(news)
+    getCaType(news)
