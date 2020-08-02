@@ -98,21 +98,21 @@ def createPredictedCaDb():
 
 if __name__=="__main__":
 
-    #Testing a perticular news
-    # news='Va Tech Wabag is quoting ex-split today. The company approved a proposal to sub-divide each ordinary equity share of face value of Rs 5/- each into face value of Rs 2 each fully paid up on May 26, 2011. The record date has been fixed at August 17.'
-    # pipeline=prediction_pipeline.PredictionPipeline()
-    # output=pipeline.pipeline(news)
-    # output.append(news)
-    # print('----DETAILS----')
-    # print('NEWS ',news)
-    # print('ORG: ',output[0])
-    # print('CA_TYPE: ',output[1])
-    # print('PURPOSE: ',output[2])
-    # print('DATE: ',output[3])
-    # print('----DETAILS----')
-    # print('----CA----')
+    #Testing a news
+    news='Va Tech Wabag is quoting ex-split today. The company approved a proposal to sub-divide each ordinary equity share of face value of Rs 5/- each into face value of Rs 2 each fully paid up on May 26, 2011. The record date has been fixed at August 17.'
+    pipeline=prediction_pipeline.PredictionPipeline()
+    output=pipeline.pipeline(news)
+    output.append(news)
+    print('----DETAILS----')
+    print('NEWS ',news)
+    print('ORG: ',output[0])
+    print('CA_TYPE: ',output[1])
+    print('PURPOSE: ',output[2])
+    print('DATE: ',output[3])
+    print('----DETAILS----')
+    print('----CA----')
 
-    addCaPredictedDataToDb()
+    # addCaPredictedDataToDb()
         
 
 

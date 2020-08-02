@@ -50,8 +50,8 @@ class PredictionPipeline:
         nlp = spacy.load('en_core_web_sm')
         doc = nlp(news)
         for ent in doc.ents:
-            if(ent.label_=='ORG' and org==''):
-                org+=ent.text
+            if(ent.label_=='ORG'):
+                org+=ent.text+" , "
             elif(ent.label_=='DATE'):
                 date+=ent.text+" , "
 
