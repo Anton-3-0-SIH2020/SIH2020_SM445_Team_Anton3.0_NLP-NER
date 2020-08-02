@@ -32,7 +32,7 @@ class PredictionPipeline:
 
     #Categorise the news based on
     def newsCategoriser(self,news):
-        filename = 'nlp_model_categorizer'
+        filename = './nlp_model_categorizer'
         infile = open(filename,'rb')
         pipeline = pickle.load(infile)
         infile.close()
@@ -50,7 +50,7 @@ class PredictionPipeline:
         nlp = spacy.load('en_core_web_sm')
         doc = nlp(news)
         for ent in doc.ents:
-            if(ent.label_=='ORG'):
+            if(ent.label_=='ORG' or ent.label_=='PERSON'):
                 org+=ent.text+" , "
             elif(ent.label_=='DATE'):
                 date+=ent.text+" , "
@@ -61,7 +61,7 @@ class PredictionPipeline:
         # print('Date: '+date)
 
         #Getting ca type
-        nlp=spacy.load('nlp_model')
+        nlp=spacy.load('./nlp_model')
         doc = nlp(news)
 
         for ent in doc.ents:

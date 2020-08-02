@@ -5,7 +5,7 @@ import pickle
 TRAIN_DATA=[]
 
 def pickleList():
-    filename = 'training_data'
+    filename = './training_data'
     outfile = open(filename,'wb')
     pickle.dump(TRAIN_DATA,outfile)
     outfile.close()
