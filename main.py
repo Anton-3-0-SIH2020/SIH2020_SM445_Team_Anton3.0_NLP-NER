@@ -102,5 +102,3 @@ if __name__=="__main__":
     output=pipeline.pipeline(news)
     output.append(news)
     print(output)
-
-    # addCaPredictedDataToDb()
