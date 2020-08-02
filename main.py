@@ -49,14 +49,14 @@ def createDbOfCaForNer():
     c=conn.cursor()
     c1=conn.cursor()
 
-    create_table='CREATE TABLE IF NOT EXISTS ca_news (content text,category text,purpose text)'
+    create_table='CREATE TABLE IF NOT EXISTS ca_news (content text,category text,purpose text,announcement_date text,record_date text)'
     c.execute(create_table)
 
     c.execute('SELECT * FROM news WHERE category="ca"')
 
-    add_item_to_table="INSERT INTO ca_news VALUES(?,?,?)"
+    add_item_to_table="INSERT INTO ca_news VALUES(?,?,?,?,?)"
     for row in c:
-        c1.execute(add_item_to_table,(row[1],'null','null'))
+        c1.execute(add_item_to_table,(row[1],'null','null','null','null'))
 
     conn.commit()
     conn.close()
@@ -72,7 +72,7 @@ def addCaPredictedDataToDb():
     conn2=sqlite3.connect('corporate_action.db')
     c1=conn2.cursor()
 
-    add_item_to_table='INSERT INTO predicted_ca VALUES(?,?,?,?)'
+    add_item_to_table='INSERT INTO predicted_ca VALUES(?,?,?,?,?)'
 
     for row in c:
         news=row[1]
@@ -82,7 +82,7 @@ def addCaPredictedDataToDb():
         detailList.append(news)
         if(len(detailList)>1):
             if(detailList[0]!=''):
-                c1.execute(add_item_to_table,(detailList[0],detailList[1],detailList[2],news))
+                c1.execute(add_item_to_table,(detailList[0],detailList[1],detailList[2],detailList[3],news))
                 conn2.commit()
     conn.close()
     conn2.close()
@@ -91,14 +91,29 @@ def addCaPredictedDataToDb():
 def createPredictedCaDb():
     conn = sqlite3.connect('corporate_action.db')
     c = conn.cursor()
-    create_table = 'CREATE TABLE IF NOT EXISTS predicted_ca (security_name text,purpose text,all_date text,content text)'
+    create_table = 'CREATE TABLE IF NOT EXISTS predicted_ca (security_name text,category text,purpose text,all_date text,content text)'
     c.execute(create_table)
     conn.commit()
     conn.close()
 
 if __name__=="__main__":
-    news='Honeywell had announced a sub - division of its existing equity shares from Rs 10 each on October 12'
-    pipeline=prediction_pipeline.PredictionPipeline()
-    output=pipeline.pipeline(news)
-    output.append(news)
-    print(output)
+
+    #Testing a perticular news
+    # news='Va Tech Wabag is quoting ex-split today. The company approved a proposal to sub-divide each ordinary equity share of face value of Rs 5/- each into face value of Rs 2 each fully paid up on May 26, 2011. The record date has been fixed at August 17.'
+    # pipeline=prediction_pipeline.PredictionPipeline()
+    # output=pipeline.pipeline(news)
+    # output.append(news)
+    # print('----DETAILS----')
+    # print('NEWS ',news)
+    # print('ORG: ',output[0])
+    # print('CA_TYPE: ',output[1])
+    # print('PURPOSE: ',output[2])
+    # print('DATE: ',output[3])
+    # print('----DETAILS----')
+    # print('----CA----')
+
+    addCaPredictedDataToDb()
+        
+
+
+    # createDbOfCaForNer()

@@ -466,6 +466,7 @@
       "PERCENT",
       "PERSON",
       "PRODUCT",
+      "PURPOSE",
       "QUANTITY",
       "TIME",
       "WORK_OF_ART"

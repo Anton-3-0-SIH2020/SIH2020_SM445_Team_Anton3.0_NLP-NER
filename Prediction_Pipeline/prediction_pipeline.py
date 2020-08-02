@@ -2,7 +2,7 @@ import sqlite3
 import csv
 import spacy
 import pickle
-import en_core_web_md
+import en_core_web_sm
 import pandas as pd
 import nltk
 import string
@@ -44,16 +44,17 @@ class PredictionPipeline:
         org=''
         date=''
         ca_type=''
+        purpose=''
 
         #Getting general information
-        nlp = spacy.load('en_core_web_md')
+        nlp = spacy.load('en_core_web_sm')
         doc = nlp(news)
         for ent in doc.ents:
             if(ent.label_=='ORG' and org==''):
                 org+=ent.text
             elif(ent.label_=='DATE'):
                 date+=ent.text+" , "
-        
+
         # print()
         # print('----CA----')
         # print('Organisation: '+org)
@@ -64,11 +65,15 @@ class PredictionPipeline:
         doc = nlp(news)
 
         for ent in doc.ents:
-            ca_type+=ent.text+" , "
+            if(ent.label_=='CA_TYPE'):
+                ca_type+=ent.text+" , "
+            elif(ent.label_=='PURPOSE'):
+                purpose+=ent.text+" , "
+
         # print('CA Type: '+ca_type)
         # print('----CA----')
         # print()
-        return [org,ca_type,date]
+        return [org,ca_type,purpose,date]
 
     def pipeline(self,news):
         category=self.newsCategoriser(news)

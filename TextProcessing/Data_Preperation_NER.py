@@ -10,10 +10,17 @@ def pickleList():
     pickle.dump(TRAIN_DATA,outfile)
     outfile.close()
 
-def processData(content,category):
-    startIndex=content.find(category)
-    endIndex=startIndex+len(category)
-    TRAIN_DATA.append((content,{"entities": [(startIndex,endIndex,"CA_TYPE")]}))
+def processData(content,category,purpose):
+    startIndexCategory=content.find(category)
+    endIndexCategory=startIndexCategory+len(category)
+
+    startIndexPurpose=content.find(purpose)
+    endIndexPurpose=startIndexPurpose+len(purpose)
+
+    if purpose=='null':
+        TRAIN_DATA.append((content,{"entities": [(startIndexCategory,endIndexCategory,"CA_TYPE")]}))
+    else:
+        TRAIN_DATA.append((content,{"entities": [(startIndexCategory,endIndexCategory,"CA_TYPE"),(startIndexPurpose,endIndexPurpose,"PURPOSE")]}))
     # print(content)
     # print(content[startIndex:endIndex])
     # print(category)
@@ -25,7 +32,7 @@ def readDataFromDb():
     c=conn.cursor()
     c.execute('SELECT * FROM ca_news WHERE category != "null"')
     for row in c:
-        processData(row[0],row[1])
+        processData(row[0],row[1],row[2])
 
 if __name__=="__main__":
     readDataFromDb()
