@@ -33,15 +33,16 @@ def initializeDb():
 
 # Creating CSV from the database
 def writeDataInCsv():
-    with open('news.csv', 'w', newline='') as file:
+    with open('news_status.csv', 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["Category", "News"])
-        conn = sqlite3.connect('news.db')
+        writer.writerow(["Status", "News"])
+        conn = sqlite3.connect('news_status.db')
         c = conn.cursor()
-        readData = 'SELECT * FROM news'
+        readData = 'SELECT * FROM ca_news'
         c.execute(readData)
         for row in c:
-            writer.writerow([row[3], row[1]])
+            if(row[3]!='null' and row[3]!=None):
+                writer.writerow([row[3], row[0]])
 
 #Creating DB for new from the news table with only ca related news
 def createDbOfCaForNer():
@@ -99,7 +100,7 @@ def createPredictedCaDb():
 if __name__=="__main__":
 
     #Testing a news
-    news='First Choice Garden Maintenance has approved issue of bonus shares in the ratio of one fully paid - up on October 14 .'
+    news='BAMPSL Securities is quoting ex-rights today. The company has announced a rights in the ratio of 2:1 at Re 1 per share on March 31, 2011. The record date has been fixed at April 20, 2011.'
     pipeline=prediction_pipeline.PredictionPipeline()
     output=pipeline.pipeline(news)
     output.append(news)
@@ -120,3 +121,5 @@ if __name__=="__main__":
 
 
     # createDbOfCaForNer()
+
+    # writeDataInCsv()
